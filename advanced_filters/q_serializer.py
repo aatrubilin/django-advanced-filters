@@ -44,12 +44,18 @@ class QSerializer(object):
     def _is_range(qtuple):
         return qtuple[0].endswith("__range") and len(qtuple[1]) == 2
 
+    @staticmethod
+    def _is_in(qtuple):
+        return qtuple[0].endswith("__in")
+
     def prepare_value(self, qtuple):
         if self._is_range(qtuple):
             qtuple[1][0] = qtuple[1][0] or min_ts
             qtuple[1][1] = qtuple[1][1] or max_ts
             qtuple[1] = (datetime.fromtimestamp(qtuple[1][0]),
                          datetime.fromtimestamp(qtuple[1][1]))
+        elif self._is_in(qtuple):
+            qtuple = qtuple[0], qtuple[1].split(",")
         return qtuple
 
     def serialize(self, q):

@@ -22,7 +22,7 @@
 	{# Add the dialog content to the bottom of the content #}
 	{% if advanced_filters %}
 		{% with advanced_filters.fields_formset as formset %}
-			<div class="white-popup mfp-hide" id="advanced_filters">
+			<div class="white-popup mfp-hide" id="advanced_filters" style="max-width: 100%;">
 				<h1>{% trans "Create advanced filter" %}:</h1>
 				<form novalidate method="POST" id="advanced_filters_form">
 					{% csrf_token %}

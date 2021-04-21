@@ -64,7 +64,13 @@ class GetFieldChoices(CsrfExemptMixin, StaffuserRequiredMixin,
                     field.name, flat=True).distinct()
                 # additional query is ok to avoid fetching too many values
                 if choices.count() <= max_choices:
-                    choices = zip(choices, choices)
+                    if isinstance(field, models.ManyToManyField):
+                        choices = [
+                            (item.pk, str(item))
+                            for item in field.related_model.objects.filter(id__in=choices)
+                        ]
+                    else:
+                        choices = zip(choices, choices)
                     logger.debug('Choices found for field %s: %s',
                                  field.name, choices)
                 else:

@@ -35,7 +35,7 @@ class VaryingTypeCharField(forms.CharField):
             return res.strip()
 
         # create a regex string out of the list of choices passed, i.e: (a|b)
-        res = r"({pattern})".format(pattern="|".join(
+        res = r"{pattern}".format(pattern=",".join(
             map(lambda x: x.strip(), split_res)))
         return res
 

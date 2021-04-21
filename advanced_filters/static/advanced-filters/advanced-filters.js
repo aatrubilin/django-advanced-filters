@@ -70,7 +70,7 @@ var OperatorHandlers = function($) {
 
 		self.value = $(elm).val();
 		self.val_input = $(elm).parents('tr').find('.query-value');
-		console.log("selected operator: " + self.value);
+		// console.log("selected operator: " + self.value);
 		var field = $(elm).parents('tr').find('.query-field');
 		self.initialize_select2(field);
 
@@ -103,13 +103,13 @@ var OperatorHandlers = function($) {
 		var field = $(elm).val();
 		var op = $(elm).parents('tr').find('.query-operator').val();
 
-		if ($.inArray(op, ["iexact", "icontains", "iregex"]) > -1) {
+		if (field !== '_OP' && $.inArray(op, ["iexact", "exact", "icontains", "in"]) > -1) {
 			var choices_url = ADVANCED_FILTER_CHOICES_LOOKUP_URL + (FORM_MODEL ||
 						  MODEL_LABEL) + '/' + field;
 			var input = $(elm).parents('tr').find('input.query-value');
 			input.select2("destroy");
 			$.get(choices_url, function(data) {
-				input.select2({'data': data, 'multiple': op == "iregex", 'createSearchChoice': function(term) {
+				input.select2({'data': data, 'multiple': op == "in", 'createSearchChoice': function(term) {
 					return { 'id': term, 'text': term };
 				}});
 			});
@@ -119,33 +119,15 @@ var OperatorHandlers = function($) {
 		}
 	};
 
-	// self.initialize_select2 = function(elm) {
-	// 	// initialize select2 widget and populate field choices
-	// 	var field = $(elm).val();
-	// 	var op = $(elm).parents('tr').find('.query-operator');
-	// 	if (field.includes('__') && op.val() == 'iexact') {
-	// 		var choices_url = ADVANCED_FILTER_CHOICES_LOOKUP_URL + (FORM_MODEL ||
-	// 						  MODEL_LABEL) + '/' + field;
-	// 		var input = $(elm).parents('tr').find('input.query-value');
-	// 		input.select2("destroy");
-	// 		$.get(choices_url, function(data) {
-	// 			input.select2({'data': data, 'createSearchChoice': function(term) {
-	//                 return { 'id': term, 'text': term };
-	//             }});
-	// 		});
-	// 	}
-	// 	else {
-	// 		var input = $(elm).parents('tr').find('input.query-value');
-	// 		input.select2("destroy");
-	// 	}
-	// };
-
 	self.field_selected = function(elm) {
 		self.selected_field_elm = elm;
 		var row = $(elm).parents('tr');
 		var op = row.find('.query-operator');
 		var value = row.find('.query-value');
 		if ($(elm).val() == "_OR") {
+			var input = $(elm).parents('tr').find('input.query-value');
+			input.select2("destroy");
+
 			op.val("iexact").prop("disabled", true);
 			value.val("null").prop("disabled", true);
 			op.after('<input type="hidden" value="' + op.val() +
@@ -189,6 +171,9 @@ var OperatorHandlers = function($) {
 				if ($(this).val() != before_change) self.field_selected(this);
 				$(this).data('pre_change', $(this).val());
 			}).change();
+			if ($(this).val() == '_OR') {
+				self.field_selected($(this));
+			}
 		});
 		// self.field_selected($('.form-row select.query-field').first());
 

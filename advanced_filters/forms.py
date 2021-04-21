@@ -48,9 +48,11 @@ def date_to_string(timestamp):
 class AdvancedFilterQueryForm(CleanWhiteSpacesMixin, forms.Form):
     """ Build the query from field, operator and value """
     OPERATORS = (
-        ("iexact", _("Equals")),
-        ("icontains", _("Contains")),
-        ("iregex", _("One of")),
+        ("iexact", _("IExact")),
+        ("exact", _("Exact")),
+        ("icontains", _("IContains")),
+        ("iregex", _("IRegex")),
+        ("in", _("In")),
         ("range", _("DateTime Range")),
         ("isnull", _("Is NULL")),
         ("istrue", _("Is TRUE")),
@@ -172,11 +174,13 @@ class AdvancedFilterQueryForm(CleanWhiteSpacesMixin, forms.Form):
 
     def clean_value(self):
         value = self.cleaned_data['value']
-        op = self.cleaned_data.get('operator', '')
-        list = ['istrue', 'isfalse', 'isnull']
-        if op not in list:
-            self.fields['value'].required = True
-            return self.fields['value'].clean(value)
+        field = self.cleaned_data['field']
+        if field != '_OR':
+            op = self.cleaned_data.get('operator', '')
+            list = ['istrue', 'isfalse', 'isnull']
+            if op not in list:
+                self.fields['value'].required = True
+                return self.fields['value'].clean(value)
         return value
 
     def make_query(self, *args, **kwargs):
